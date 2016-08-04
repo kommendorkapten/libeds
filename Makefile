@@ -29,7 +29,8 @@ CFLAGS += -DNDEBUG
 endif
 
 DIRS = obj bin
-RAWOBJS = btree.o llist.o stack.o
+SOURCES = btree.c llist.c stack.c hmap.c
+RAWOBJS = $(SOURCES:%.c=%.o)
 OBJS = $(RAWOBJS:%=obj/%)
 RAWTESTS = $(RAWOBJS:%.o=%_test)
 TESTS = $(RAWTESTS:%=bin/%)
@@ -57,4 +58,4 @@ clean:
 	rm -rf obj/*.o bin/*
 
 lint:
-	lint -Xc99 -m64 -errchk=%all -Ncheck=%all -Nlevel=3 llist.c
+	lint -Xc99 -m64 -errwarn=%all -errchk=%all -Ncheck=%all -Nlevel=2 -u -m -erroff=E_FUNC_RET_ALWAYS_IGNOR $(SOURCES)
