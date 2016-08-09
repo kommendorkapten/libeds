@@ -29,7 +29,7 @@ CFLAGS += -DNDEBUG
 endif
 
 DIRS = obj bin
-SOURCES = btree.c llist.c stack.c hmap.c
+SOURCES = btree.c llist.c stack.c hmap.c heap.c
 RAWOBJS = $(SOURCES:%.c=%.o)
 OBJS = $(RAWOBJS:%=obj/%)
 RAWTESTS = $(RAWOBJS:%.o=%_test)
@@ -47,6 +47,9 @@ $(DIRS):
 	mkdir $(DIRS)
 
 test: $(TESTS)
+
+bin/perf: perf.c $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 
 bin/%: %.c $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(LFLAGS)
