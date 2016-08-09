@@ -20,7 +20,7 @@ struct hmap
 	hmap_cmp          cfn;
 	struct hmap_node* elems;
 	size_t            cap;
-        size_t            count;
+        size_t            size;
         float             lfactor;
 };
 
@@ -101,10 +101,16 @@ struct hmap* hmap_create(hmap_hash hfn, hmap_cmp cfn, size_t cap, float lf)
 	h->cfn = cfn;
 	h->cap = cap;
 	h->elems = malloc(cap * sizeof(struct hmap_node));
-	h->count = 0;
+	h->size = 0;
 	h->lfactor = lf;
 	memset(h->elems, 0, cap * sizeof(struct hmap_node));
 	return h;
+}
+
+void hmap_clear(struct hmap* h)
+{
+        h->size = 0;
+	memset(h->elems, 0, h->cap * sizeof(struct hmap_node));
 }
 
 void hmap_destroy(struct hmap* h)
@@ -149,8 +155,8 @@ void hmap_set(struct hmap* h, void* key, void* data)
         if (added)
         {
                 float lfactor;
-                h->count++;
-                lfactor = ((float)h->count) / h->cap;
+                h->size++;
+                lfactor = ((float)h->size) / h->cap;
 
                 if (lfactor > h->lfactor)
                 {
@@ -158,7 +164,7 @@ void hmap_set(struct hmap* h, void* key, void* data)
 
                         /* Extend capacity by two */
                         h->cap *= 2;
-                        h->count = 0;
+                        h->size = 0;
 
                         /* allocate more data and re-hash */
                         struct hmap_node* new;
@@ -231,7 +237,7 @@ void hmap_del(struct hmap* h, void* key)
 
 	if (h->cfn(h->elems[pos].key, key) == 0)
 	{
-                h->count--;
+                h->size--;
 		h->elems[pos].flags = FLAG_DELETED;
                 return;
 	}
@@ -243,7 +249,7 @@ void hmap_del(struct hmap* h, void* key)
 		if (h->elems[pos].hash == k && 
                     h->cfn(h->elems[pos].key, key) == 0)
 		{
-                        h->count--;
+                        h->size--;
                         h->elems[pos].flags = FLAG_DELETED;
 			return;
 		}
@@ -261,7 +267,7 @@ void hmap_del(struct hmap* h, void* key)
 
 size_t hmap_size(const struct hmap* h)
 {
-        return h->count;
+        return h->size;
 }
 
 size_t hmap_cap(const struct hmap* h)
@@ -269,9 +275,9 @@ size_t hmap_cap(const struct hmap* h)
         return h->cap;
 }
 
-struct hmap_entry* hmap_iter(const struct hmap* h, size_t* count)
+struct hmap_entry* hmap_iter(const struct hmap* h, size_t* size)
 {
-        struct hmap_entry* e = malloc(h->count * sizeof(struct hmap_entry));
+        struct hmap_entry* e = malloc(h->size * sizeof(struct hmap_entry));
         size_t p = 0;
 
         for (size_t i = 0; i < h->cap; i++)
@@ -284,7 +290,7 @@ struct hmap_entry* hmap_iter(const struct hmap* h, size_t* count)
                 }
         }
         
-        *count = h->count;
+        *size = h->size;
 
         return e;
 }

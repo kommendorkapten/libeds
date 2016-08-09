@@ -5,6 +5,7 @@
 
 int test_hmap_create(void);
 int test_hmap_get_set(void);
+int test_hmap_clear(void);
 int test_hmap_del(void);
 int test_hmap_expand(void);
 int test_hmap_iter(void);
@@ -22,6 +23,7 @@ int main(void)
         
         SCUT_ADD(test_hmap_create);
         SCUT_ADD(test_hmap_get_set);
+        SCUT_ADD(test_hmap_clear);
         SCUT_ADD(test_hmap_del);
         SCUT_ADD(test_hmap_expand);
         SCUT_ADD(test_hmap_iter);
@@ -74,6 +76,40 @@ int test_hmap_get_set(void)
         hmap_set(h, "aa", (void*)123l);
         SCUT_ASSERT_IE(hmap_size(h), 3);
         SCUT_ASSERT_IE(hmap_get(h, "aa"), (void*)123l);
+
+        hmap_destroy(h);
+
+        return 0;
+}
+
+int test_hmap_clear(void)
+{
+        struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
+        
+        SCUT_ASSERT_IE(hmap_size(h), 0);
+
+        hmap_set(h, "a", (void*)1l);
+        hmap_set(h, "aa", (void*)2l);
+        hmap_set(h, "aaa", (void*)3l);
+
+        SCUT_ASSERT_IE(hmap_size(h), 3);
+        SCUT_ASSERT_IE(hmap_cap(h), 128);
+        
+        hmap_clear(h);
+        SCUT_ASSERT_IE(hmap_size(h), 0);
+
+        hmap_set(h, "a", (void*)4l);
+        hmap_set(h, "aa", (void*)5l);
+        hmap_set(h, "aaa", (void*)6l);
+
+        SCUT_ASSERT_IE(hmap_get(h, "a"), (void*)4l);
+        SCUT_ASSERT_IE(hmap_get(h, "aa"), (void*)5l);
+        SCUT_ASSERT_IE(hmap_get(h, "aaa"), (void*)6l);
+
+        SCUT_ASSERT_IE(hmap_size(h), 3);
+        SCUT_ASSERT_IE(hmap_cap(h), 128);
+
+        SCUT_ASSERT_IE(hmap_get(h, "aaaa"), NULL);
 
         hmap_destroy(h);
 

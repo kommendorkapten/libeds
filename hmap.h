@@ -34,6 +34,13 @@ struct hmap_entry
 struct hmap* hmap_create(hmap_hash, hmap_cmp, size_t, float);
 
 /**
+ * Clear the hash table.
+ * @param the hash table to clear.
+ * @return void
+ */
+void hmap_clear(struct hmap*);
+
+/**
  * Destroy the hash table and free all memory.
  * @param the hash table to destroy.
  * @return void.
