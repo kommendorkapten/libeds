@@ -44,6 +44,8 @@ extern void btree_destroy(struct btree*);
 
 /**
  * Insert an item into the tree.
+ * If an item with the same order is present, it will be replaced with the
+ * new value.
  * @param the tree to insert the item too.
  * @param the item to insert.
  * @return 0 on success.
