@@ -101,11 +101,11 @@ int btree_insert(struct btree* bt, void* d)
         }
 
         struct node* n = bt->root;
-        
+
         for (;;)
         {
                 int c = bt->cmp(n->data, d);
-                
+
                 if (c == 0)
                 {
                         /* Replace */
@@ -424,7 +424,7 @@ int btree_balance(struct btree* bt)
 
 struct node* alloc_node(void* d)
 {
-        struct node* new = (struct node*)malloc(sizeof(struct node));
+        struct node* new = malloc(sizeof(struct node));
         
         new->data = d;
         new->left = NULL;
