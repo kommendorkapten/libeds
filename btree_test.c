@@ -63,7 +63,7 @@ int test_bt_insert(void)
         SCUT_ASSERT_TRUE(bt);
         SCUT_ASSERT_IE(btree_height(bt), 0);
 
-        // Insert in worst case order, shall only be allowed to insert two
+        /* Insert in worst case order, shall only be allowed to insert two */
         SCUT_ASSERT_IE(btree_insert(bt, "a"), 0);
         SCUT_ASSERT_IE(btree_insert(bt, "aa"), 0);
         SCUT_ASSERT_IE(btree_insert(bt, "aaa"), 0);
@@ -74,7 +74,7 @@ int test_bt_insert(void)
         SCUT_ASSERT_IE(btree_height(bt), 0);
         SCUT_ASSERT_IE(btree_size(bt), 0);
        
-        // Insert in optimal order, shall store four items
+        /* Insert in optimal order, shall store four items */
         SCUT_ASSERT_IE(btree_insert(bt, "aaa"), 0);
         SCUT_ASSERT_IE(btree_insert(bt, "aa"), 0);
         SCUT_ASSERT_IE(btree_insert(bt, "aa"), 0);
@@ -127,7 +127,7 @@ int test_bt_remove(void)
         struct btree* bt = btree_create(&cmp_lng);
         void* e;
 
-        // No children
+        /* No children */
         SCUT_ASSERT_IE(btree_insert(bt, (void*)10l), 0);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)5l), 0);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)14l), 0);
@@ -141,7 +141,7 @@ int test_bt_remove(void)
 
         btree_destroy(bt);
 
-        // one left child
+        /* one left child */
         bt = btree_create(&cmp_lng);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)50l), 0);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)25l), 0);
@@ -159,7 +159,7 @@ int test_bt_remove(void)
         SCUT_ASSERT_FALSE(btree_find(bt, (void*)25l));
         btree_destroy(bt);
 
-        // one right child
+        /* one right child */
         bt = btree_create(&cmp_lng);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)10l), 0);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)5l), 0);
@@ -181,7 +181,7 @@ int test_bt_remove(void)
 
         btree_destroy(bt);
 
-        // two children
+        /* two children */
         bt = btree_create(&cmp_lng);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)50l), 0);
         SCUT_ASSERT_IE(btree_insert(bt, (void*)25l), 0);
