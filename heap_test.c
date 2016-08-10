@@ -1,13 +1,13 @@
 #include <scut.h>
 #include "heap.h"
 
-int test_heap_create(void);
-int test_heap_insert(void);
-int test_heap_clear(void);
-int test_heap_min(void);
-int test_heap_expand(void);
+static int test_heap_create(void);
+static int test_heap_insert(void);
+static int test_heap_clear(void);
+static int test_heap_min(void);
+static int test_heap_expand(void);
 
-int test_cmp(const void* a, const void* b)
+static int test_cmp(const void* a, const void* b)
 {
         long t1 = (long)a;
         long t2 = (long)b;
@@ -24,7 +24,7 @@ int test_cmp(const void* a, const void* b)
         return 0;
 }
 
-int main(void)
+int test_heap(void)
 {
         int ret;
 
@@ -38,10 +38,12 @@ int main(void)
 
         ret = scut_run(0);
 
+        scut_destroy();
+
         return ret;
 }
 
-int test_heap_create(void)
+static int test_heap_create(void)
 {
         struct heap* h = heap_create(&test_cmp);
         
@@ -58,7 +60,7 @@ int test_heap_create(void)
         return 0;
 }
 
-int test_heap_insert(void)
+static int test_heap_insert(void)
 {
         struct heap* h = heap_create(&test_cmp);
         
@@ -74,7 +76,7 @@ int test_heap_insert(void)
         return 0;        
 }
 
-int test_heap_clear(void)
+static int test_heap_clear(void)
 {
         struct heap* h = heap_create(&test_cmp);
         
@@ -101,7 +103,7 @@ int test_heap_clear(void)
         return 0;        
 }
 
-int test_heap_min(void)
+static int test_heap_min(void)
 {
         struct heap* h = heap_create(&test_cmp);        
         void* r;
@@ -161,7 +163,7 @@ int test_heap_min(void)
         return 0;
 }
 
-int test_heap_expand(void)
+static int test_heap_expand(void)
 {
         struct heap* h = heap_create(&test_cmp);
 

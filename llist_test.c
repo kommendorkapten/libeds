@@ -1,12 +1,12 @@
 #include <scut.h>
 #include "llist.h"
 
-int test_ll_pushf(void);
-int test_ll_pushb(void);
-int test_ll_iter(void);
-int test_ll_clear(void);
+static int test_ll_pushf(void);
+static int test_ll_pushb(void);
+static int test_ll_iter(void);
+static int test_ll_clear(void);
 
-int main(void)
+int test_llist(void)
 {
         int ret;
 
@@ -19,10 +19,12 @@ int main(void)
 
         ret = scut_run(0);
 
+        scut_destroy();
+
         return ret;
 }
 
-int test_ll_pushf(void)
+static int test_ll_pushf(void)
 {
         struct llist* l = llist_create();
         void* ret;
@@ -49,7 +51,7 @@ int test_ll_pushf(void)
         return 0;
 }
 
-int test_ll_pushb(void)
+static int test_ll_pushb(void)
 {
         struct llist* l = llist_create();
         void* ret;
@@ -78,7 +80,7 @@ int test_ll_pushb(void)
         return 0;
 }
 
-int test_ll_iter(void)
+static int test_ll_iter(void)
 {
         struct llist* l = llist_create();
         struct lnode* n;
@@ -110,7 +112,7 @@ int test_ll_iter(void)
         return 0;
 }
 
-int test_ll_clear(void)
+static int test_ll_clear(void)
 {
         struct llist* l = llist_create();
 

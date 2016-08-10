@@ -3,19 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-int test_hmap_create(void);
-int test_hmap_get_set(void);
-int test_hmap_clear(void);
-int test_hmap_del(void);
-int test_hmap_expand(void);
-int test_hmap_iter(void);
+static int test_hmap_create(void);
+static int test_hmap_get_set(void);
+static int test_hmap_clear(void);
+static int test_hmap_del(void);
+static int test_hmap_expand(void);
+static int test_hmap_iter(void);
 
 uint32_t const_hash(void* key)
 {
         return 1;
 }
 
-int main(void)
+int test_hmap(void)
 {
         int ret;
         
@@ -30,10 +30,12 @@ int main(void)
 
         ret = scut_run(0);
 
+        scut_destroy();
+
         return ret;
 }
 
-int test_hmap_create(void)
+static int test_hmap_create(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
         struct hmap_entry* i;
@@ -53,7 +55,7 @@ int test_hmap_create(void)
         return 0;
 }
 
-int test_hmap_get_set(void)
+static int test_hmap_get_set(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
         
@@ -82,7 +84,7 @@ int test_hmap_get_set(void)
         return 0;
 }
 
-int test_hmap_clear(void)
+static int test_hmap_clear(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
         
@@ -116,7 +118,7 @@ int test_hmap_clear(void)
         return 0;
 }
 
-int test_hmap_del(void)
+static int test_hmap_del(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
         
@@ -198,7 +200,7 @@ int test_hmap_del(void)
         return 0;
 }
 
-int test_hmap_expand(void)
+static int test_hmap_expand(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 16, 0.7);        
         long values[14] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
@@ -267,7 +269,7 @@ int test_hmap_expand(void)
         return 0;
 }
 
-int test_hmap_iter(void)
+static int test_hmap_iter(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
         struct hmap_entry* data;

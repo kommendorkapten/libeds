@@ -5,15 +5,15 @@
 #include <stdlib.h>
 
 extern void btree_print(struct btree*);
-int test_bt_insert(void);
-int test_bt_find(void);
-int test_bt_remove(void);
-int test_bt_bf(void);
-int test_bt_df(void);
-int test_bt_balance(void);
-int cmp_fun(const void*, const void*);
+static int test_bt_insert(void);
+static int test_bt_find(void);
+static int test_bt_remove(void);
+static int test_bt_bf(void);
+static int test_bt_df(void);
+static int test_bt_balance(void);
+static int cmp_fun(const void*, const void*);
 
-int main(void)
+int test_btree(void)
 {
         int ret;
 
@@ -27,10 +27,12 @@ int main(void)
         SCUT_ADD(test_bt_balance);
         ret = scut_run(0);
 
+        scut_destroy();
+
         return ret;
 }
 
-int cmp_fun(const void* a, const void* b)
+static int cmp_fun(const void* a, const void* b)
 {
         char* s1 = (char*)a;
         char* s2 = (char*)b;
@@ -38,7 +40,7 @@ int cmp_fun(const void* a, const void* b)
         return strcmp(s1, s2);
 }
 
-int cmp_lng(const void* a, const void* b)
+static int cmp_lng(const void* a, const void* b)
 {
         long s1 = (long)a;
         long s2 = (long)b;
@@ -56,7 +58,7 @@ int cmp_lng(const void* a, const void* b)
         return ret;
 }
 
-int test_bt_insert(void)
+static int test_bt_insert(void)
 {
         struct btree* bt = btree_create(&cmp_fun);
         
@@ -88,7 +90,7 @@ int test_bt_insert(void)
         return 0;
 }
 
-int test_bt_find(void)
+static int test_bt_find(void)
 {
         struct btree* bt;
         void* ret;
@@ -122,7 +124,7 @@ int test_bt_find(void)
         return 0;
 }
 
-int test_bt_remove(void)
+static int test_bt_remove(void)
 {
         struct btree* bt = btree_create(&cmp_lng);
         void* e;
@@ -212,7 +214,7 @@ int test_bt_remove(void)
         return 0;
 }
 
-int test_bt_bf(void) 
+static int test_bt_bf(void) 
 {
         struct btree* bt = btree_create(&cmp_lng);
         void** traversal;
@@ -260,7 +262,7 @@ int test_bt_bf(void)
         return 0;
 }
 
-int test_bt_df(void) 
+static int test_bt_df(void) 
 {
         struct btree* bt = btree_create(&cmp_lng);
         void** traversal;
@@ -308,7 +310,7 @@ int test_bt_df(void)
         return 0;
 }
 
-int test_bt_balance(void)
+static int test_bt_balance(void)
 {
         struct btree* bt = btree_create(&cmp_lng);
 

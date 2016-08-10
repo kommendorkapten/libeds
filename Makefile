@@ -1,41 +1,46 @@
 CC = gcc
-CFLAGS = -m64 -O2 -I/usr/local/include
-LFLAGS += -L/usr/local/lib -lscut
-UNAME = $(shell uname -s)
+CFLAGS = -m64 -I/usr/local/include
+LFLAGS += 
+LSCUT = -L/usr/local/lib -lscut
+OS = $(shell uname -s)
+ISA = $(shell uname -i)
 DEBUG = 1
 
 # Default to c99 on Solaris
-ifeq ($(UNAME), SunOS)
-CC = c99
-CFLAGS += -D_POSIX_C_SOURCE=200112L 
+ifeq ($(OS), SunOS)
+  CC = c99
+  CFLAGS += -D_POSIX_C_SOURCE=200112L
 endif
 
 # Configure stuff based on compiler
 ifeq ($(CC), gcc)
-CFLAGS += -W -Wall -pedantic -std=c99
+  CFLAGS += -W -Wall -pedantic -std=c99 -O2
 endif
 
-# Configure based on OS
-ifeq ($(UNAME), SunOS)
-ifeq ($(CC), c99)
-CFLAGS += -v
-endif
+# Configure based on OS/Compiler
+ifeq ($(OS), SunOS)
+  ifeq ($(CC), c99)
+    CFLAGS += -v  -xO5
+    ifeq ($(ISA), i86pc)
+      CFLAGS += -xarch=sse4_2
+    endif
+  endif
 endif
 
 ifeq ($(DEBUG), 1)
-CFLAGS += -g
+  CFLAGS += -g
 else
-CFLAGS += -DNDEBUG
+  CFLAGS += -DNDEBUG
 endif
 
 DIRS = obj bin
 SOURCES = btree.c llist.c stack.c hmap.c heap.c
-RAWOBJS = $(SOURCES:%.c=%.o)
-OBJS = $(RAWOBJS:%=obj/%)
-RAWTESTS = $(RAWOBJS:%.o=%_test)
-TESTS = $(RAWTESTS:%=bin/%)
+OBJS = $(SOURCES:%.c=obj/%.o)
+TEST_OBJS = $(OBJS:%.o=%_test.o)
 
 .PHONY: clean
+.PHONY: test
+.PHONY: lint
 
 ###################################################################
 
@@ -46,10 +51,11 @@ dir: $(DIRS)
 $(DIRS):
 	mkdir $(DIRS)
 
-test: $(TESTS)
+test: bin/test
+	$<
 
-bin/perf: perf.c $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+bin/test: test.c $(TEST_OBJS) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(TEST_OBJS) $(LFLAGS) $(LSCUT)
 
 bin/%: %.c $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(LFLAGS)

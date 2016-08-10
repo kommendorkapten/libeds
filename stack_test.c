@@ -1,12 +1,12 @@
 #include "stack.h"
 #include <scut.h>
 
-int test_stack_push(void);
-int test_stack_clear(void);
-int test_stack_no_expand(void);
-int test_stack_expand(void);
+static int test_stack_push(void);
+static int test_stack_clear(void);
+static int test_stack_no_expand(void);
+static int test_stack_expand(void);
 
-int main(void)
+int test_stack(void)
 {
         int ret;
 
@@ -19,10 +19,12 @@ int main(void)
 
         ret = scut_run(0);
 
+        scut_destroy();
+
         return ret;
 }
 
-int test_stack_push(void)
+static int test_stack_push(void)
 {
         struct stack* s = stack_create(12, 0);
 
@@ -49,7 +51,7 @@ int test_stack_push(void)
         return 0;
 }
 
-int test_stack_clear(void)
+static int test_stack_clear(void)
 {
         struct stack* s = stack_create(12, 0);
         int ret;
@@ -75,7 +77,7 @@ int test_stack_clear(void)
         return 0;
 }
 
-int test_stack_no_expand(void)
+static int test_stack_no_expand(void)
 {
         struct stack* s = stack_create(12, 0);
         int ret;
@@ -97,7 +99,7 @@ int test_stack_no_expand(void)
         return 0;
 }
 
-int test_stack_expand(void)
+static int test_stack_expand(void)
 {
         struct stack* s = stack_create(12, STACK_AUTO_EXPAND);
         int ret;
