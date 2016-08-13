@@ -5,6 +5,12 @@
 #include <stdint.h>
 
 typedef uint32_t (*hmap_hash)(void*);
+/**
+ * Compare method to determine equality.
+ * @param the item found in the hash map.
+ * @param the item searched ford.
+ * @return 0 if items are equal, non zero otherwise.
+ */
 typedef int (*hmap_cmp)(void*, void*);
 
 struct hmap;
@@ -25,7 +31,7 @@ struct hmap_entry
  *        is used, and key is interpreted as a char* with a max length
  *        of 128 characters.. 
  * @param the compare method to use. If NULL, keys are interpreted
- *        as char* with a max length of 128 characters.and strncmp(3C)
+ *        as char* with a max length of 128 characters, and strncmp(3C)
  *        is used.
  * @param the initial capacity.
  * @param the max load factor.
