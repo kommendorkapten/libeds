@@ -21,12 +21,6 @@
 #define FLAG_OCCUPIED 0x1
 #define FLAG_DELETED  0x2
 
-/*
-** Count
-** Load factor with re-hash
-** Linear probing
-*/
-
 struct hmap
 {
         hmap_hash         hfn;
