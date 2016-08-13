@@ -20,7 +20,7 @@ endif
 # Configure based on OS/Compiler
 ifeq ($(OS), SunOS)
   ifeq ($(CC), c99)
-    CFLAGS += -v  -xO5
+    CFLAGS += -v -xO5
     ifeq ($(ISA), i86pc)
       CFLAGS += -xarch=sse4_2
     endif
@@ -51,14 +51,14 @@ dir: $(DIRS)
 $(DIRS):
 	mkdir $(DIRS)
 
-test: bin/test
+test: bin/test $(TEST_OBJS)
 	$<
 
 bin/test: test.c $(TEST_OBJS) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(TEST_OBJS) $(LFLAGS) $(LSCUT)
 
-bin/%: %.c $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(LFLAGS)
+bin/perf: perf.c $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(LFLAGS) -lm
 
 obj/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
