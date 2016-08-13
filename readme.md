@@ -1,4 +1,4 @@
-# Elementary data structures
+# Elementary data structures (libeds).
 
 Collection of some elementary data strucutres, implemented in standard
 C99.
