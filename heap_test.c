@@ -39,7 +39,7 @@ int test_heap(void)
         ret = scut_run(0);
 
         scut_destroy();
-
+        
         return ret;
 }
 
@@ -168,14 +168,16 @@ static int test_heap_expand(void)
         struct heap* h = heap_create(&test_cmp);
 
         /* default size is 128 entries */
+        long size = 100000;
 
-        for (long i = 256; i > 0; i--)
+
+        for (long i = size; i > 0; i--)
         {
                 heap_insert(h, (void*)i);
         }
-        SCUT_ASSERT_IE(heap_size(h), 256);
+        SCUT_ASSERT_IE(heap_size(h), size);
         
-        for (long i = 1; i <= 256; i++)
+        for (long i = 1; i <= size; i++)
         {
                 void* r = heap_min(h);
                 
