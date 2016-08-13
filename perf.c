@@ -262,7 +262,7 @@ void perf_rebalance(int outer, int inner)
                         void* e;
 
                         begin = current_time_us();
-                        e = btree_find(bt, (void*)(i * outer + inner + 1L));
+                        e = btree_find(bt, (void*)data[i * inner + j]);
                         dur = current_time_us() - begin;
                         dur_btree[i * inner + j] = (int)dur;
                         assert(e != NULL);
