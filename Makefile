@@ -1,10 +1,10 @@
-CC = gcc
+CC     = gcc
 CFLAGS = -m64 -I/usr/local/include
 LFLAGS += 
-LSCUT = -L/usr/local/lib -lscut
-OS = $(shell uname -s)
-ISA = $(shell uname -i)
-DEBUG = 1
+LSCUT  = -L/usr/local/lib -lscut
+OS     = $(shell uname -s)
+ISA    = $(shell uname -p)
+DEBUG  = 1
 
 # Default to c99 on Solaris
 ifeq ($(OS), SunOS)
@@ -21,9 +21,13 @@ endif
 ifeq ($(OS), SunOS)
   ifeq ($(CC), c99)
     CFLAGS += -v -xO5
-    ifeq ($(ISA), i86pc)
+    ifeq ($(ISA), i386)
       CFLAGS += -xarch=sse4_2
     endif
+  endif
+else ifeq ($(OS), FreeBSD)
+  ifeq ($(CC), gcc)
+    CFLAGS += -mtune=$(ISA) -mcpu=$(ISA)
   endif
 endif
 
@@ -33,9 +37,9 @@ else
   CFLAGS += -DNDEBUG
 endif
 
-DIRS = obj bin
-SOURCES = btree.c llist.c stack.c hmap.c heap.c
-OBJS = $(SOURCES:%.c=obj/%.o)
+DIRS      = obj bin
+SOURCES   = btree.c llist.c stack.c hmap.c heap.c
+OBJS      = $(SOURCES:%.c=obj/%.o)
 TEST_OBJS = $(OBJS:%.o=%_test.o)
 
 .PHONY: clean
