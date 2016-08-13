@@ -67,4 +67,4 @@ clean:
 	rm -rf obj/*.o bin/*
 
 lint:
-	lint -Xc99 -m64 -errwarn=%all -errchk=%all -Ncheck=%all -Nlevel=2 -u -m -erroff=E_FUNC_RET_ALWAYS_IGNOR $(SOURCES)
+	lint -Xc99 -m64 -errwarn=%all -errchk=%all -Ncheck=%all -Nlevel=1 -u -m -erroff=E_FUNC_RET_ALWAYS_IGNOR,E_SIGN_EXTENSION_PSBL,E_CAST_INT_TO_SMALL_INT $(SOURCES) perf.c
