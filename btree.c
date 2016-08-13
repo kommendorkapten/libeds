@@ -432,6 +432,8 @@ int btree_balance(struct btree* bt)
         }
 
         free(bf);
+        free(stack_b);
+        free(stack_e);
         return 0;
 }
 
