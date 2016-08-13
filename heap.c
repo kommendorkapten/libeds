@@ -16,12 +16,12 @@ struct heap
 struct heap* heap_create(heap_cmp cmp)
 {
         struct heap* h = malloc(sizeof(struct heap));
-        size_t size = 128; /* first guess of size */
+        size_t cap = 128; /* first guess of size */
         
-        h->items = malloc(size * sizeof(void*));
+        h->items = malloc(cap * sizeof(void*));
         h->cmp = cmp;
         h->size = 0L;
-        h->cap = size;
+        h->cap = cap;
 
         return h;
 }
@@ -98,6 +98,7 @@ int heap_insert(struct heap* h, void* e)
                 }
 
                 h->cap = new_cap;
+                h->items = new;
         }
 
         /* Restore partial ordering property */
