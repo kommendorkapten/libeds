@@ -14,7 +14,8 @@ endif
 
 # Configure stuff based on compiler
 ifeq ($(CC), gcc)
-  CFLAGS += -W -Wall -pedantic -std=c99 -O2
+  CFLAGS += -pedantic -std=c99 -O3 -fstrict-aliasing -Werror
+  CFLAGS += -Wextra -Wall -Wconversion -Wno-sign-conversion -Wstrict-aliasing
 endif
 
 # Configure based on OS/Compiler
