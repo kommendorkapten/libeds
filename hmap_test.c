@@ -136,16 +136,27 @@ static int test_hmap_clear(void)
 static int test_hmap_del(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
+        struct hmap_entry e;
+        char* k = malloc(2);
+        strcpy(k, "a");
 
         SCUT_ASSERT_IE(hmap_size(h), 0);
 
-        hmap_set(h, "a", (void*)1l);
-        SCUT_ASSERT_IE(hmap_get(h, "a"), (void*)1l);
-        SCUT_ASSERT_IE(hmap_size(h), 1);
+        e = hmap_del(h, "c");
+        SCUT_ASSERT_IE(e.key, 0);
+        SCUT_ASSERT_IE(e.data, 0);
 
-        hmap_del(h, "a");
+        hmap_set(h, k, (void*)10l);
+        SCUT_ASSERT_IE(hmap_get(h, "a"), (void*)10l);
+        SCUT_ASSERT_IE(hmap_size(h), 1);
+        hmap_set(h, "a", (void*)1L);
+
+        e = hmap_del(h, "a");
+        SCUT_ASSERT_IE(e.key, k);
+        SCUT_ASSERT_IE(e.data, 1L);
         SCUT_ASSERT_IE(hmap_get(h, "a"), NULL);
         SCUT_ASSERT_IE(hmap_size(h), 0);
+        free(k);
 
         hmap_destroy(h);
 

@@ -33,19 +33,19 @@ struct hmap
 
 struct hmap_node
 {
-        void*    key;
-        void*    data;
+        const void* key;
+        void*       data;
 #ifdef HMAP_USE_TS
-        time_t   acc_ts;
+        time_t      acc_ts;
 #endif
-        uint32_t hash;
-        int flags;
+        uint32_t    hash;
+        int         flags;
 };
 
-static uint32_t hmap_default_hash(void* key)
+static uint32_t hmap_default_hash(const void* key)
 {
         /* Jenkin's one at a time hash */
-        char* k = (char*) key;
+        const char* k = (const char*) key;
         uint32_t hash = 0;
 #ifdef __EXTENSIONS__
         /* strnlen(3C) became availible SUSv4/Posix 2008 */
@@ -73,7 +73,7 @@ static uint32_t hmap_default_hash(void* key)
         return hash;
 }
 
-static int hmap_default_cmp(void* a, void* b)
+static int hmap_default_cmp(const void* a, const void* b)
 {
         int r;
 
@@ -86,7 +86,7 @@ static int hmap_default_cmp(void* a, void* b)
                 return 1;
         }
 
-        r = strncmp((char*)a, (char*)b, MAX_KEY_LEN);
+        r = strncmp((const char*)a, (const char*)b, MAX_KEY_LEN);
 
         return r;
 }
@@ -126,7 +126,7 @@ void hmap_destroy(struct hmap* h)
         free(h);
 }
 
-void hmap_set(struct hmap* h, void* key, void* data)
+void hmap_set(struct hmap* h, const void* key, void* data)
 {
         uint32_t k = h->hfn(key);
         size_t spos = k % h->cap;
@@ -203,7 +203,7 @@ void hmap_set(struct hmap* h, void* key, void* data)
         }
 }
 
-void* hmap_get(const struct hmap* h, void* key)
+void* hmap_get(const struct hmap* h, const void* key)
 {
         uint32_t k = h->hfn(key);
         size_t spos = k % h->cap;
@@ -242,17 +242,25 @@ void* hmap_get(const struct hmap* h, void* key)
         return NULL;
 }
 
-void hmap_del(struct hmap* h, void* key)
+struct hmap_entry hmap_del(struct hmap* h, const void* key)
 {
+        struct hmap_entry ret = {.key = NULL, .data = NULL};
         uint32_t k = h->hfn(key);
         size_t spos = k % h->cap;
         size_t pos = spos;
 
         if (h->cfn(h->elems[pos].key, key) == 0)
         {
-                h->size--;
+                ret.key = h->elems[pos].key;
+                ret.data = h->elems[pos].data;
+
                 h->elems[pos].flags = FLAG_DELETED;
-                return;
+                h->elems[pos].key = NULL;
+                h->elems[pos].data = NULL;
+
+                h->size--;
+
+                return ret;
         }
 
         /* Do a linear probe */
@@ -262,9 +270,16 @@ void hmap_del(struct hmap* h, void* key)
                 if (h->elems[pos].hash == k &&
                     h->cfn(h->elems[pos].key, key) == 0)
                 {
-                        h->size--;
+                        ret.key = h->elems[pos].key;
+                        ret.data = h->elems[pos].data;
+
                         h->elems[pos].flags = FLAG_DELETED;
-                        return;
+                        h->elems[pos].key = NULL;
+                        h->elems[pos].data = NULL;
+
+                        h->size--;
+
+                        return ret;
                 }
                 pos = (pos + 1) % h->cap;
 
@@ -275,7 +290,7 @@ void hmap_del(struct hmap* h, void* key)
                 }
         }
 
-        return;
+        return ret;
 }
 
 size_t hmap_size(const struct hmap* h)

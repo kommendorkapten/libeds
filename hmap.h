@@ -17,20 +17,25 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef uint32_t (*hmap_hash)(void*);
+/**
+ * Hash function used.
+ * @param value to hash.
+ * @return hash value as unsigned int32.
+ */
+typedef uint32_t (*hmap_hash)(const void*);
 /**
  * Compare method to determine equality.
  * @param the item found in the hash map.
  * @param the item searched ford.
  * @return 0 if items are equal, non zero otherwise.
  */
-typedef int (*hmap_cmp)(void*, void*);
+typedef int (*hmap_cmp)(const void*, const void*);
 
 struct hmap;
 
 struct hmap_entry
 {
-        void* key;
+        const void* key;
         void* data;
 };
 
@@ -80,7 +85,7 @@ void hmap_destroy(struct hmap*);
  * @param the value to insert.
  * @return void.
  */
-void hmap_set(struct hmap*, void* key, void* data);
+void hmap_set(struct hmap*, const void* key, void* data);
 
 /**
  * Retrieve a value from the hash table. If no data is found for the
@@ -89,15 +94,16 @@ void hmap_set(struct hmap*, void* key, void* data);
  * @param the key to search for.
  * @return the value associated with the key, or NULL if key is not present.
  */
-void* hmap_get(const struct hmap*, void*);
+void* hmap_get(const struct hmap*, const void*);
 
 /**
  * Delete a key from the hash table.
  * @param the hash table.
  * @param the key to delete.
- * @return void.
+ * @return a hmap_entry containing the delete key/value. If key is not present,
+ *         returned entry contains NULL/NULL.
  */
-void hmap_del(struct hmap*, void*);
+struct hmap_entry hmap_del(struct hmap*, const void*);
 
 /**
  * Get the number of stored items in the hash table.
