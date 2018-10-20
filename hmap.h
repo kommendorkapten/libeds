@@ -6,7 +6,7 @@
 * Development and Distribution License (the "License"). You may not use this
 * file except in compliance with the License. You can obtain a copy of the
 * License at http://opensource.org/licenses/CDDL-1.0. See the License for the
-* specific language governing permissions and limitations under the License. 
+* specific language governing permissions and limitations under the License.
 * When distributing the software, include this License Header Notice in each
 * file and include the License file at http://opensource.org/licenses/CDDL-1.0.
 */
@@ -35,14 +35,14 @@ struct hmap_entry
 };
 
 /**
- * Create a hash table with provided hash, cmp, capacity and desisred 
- * load factor. If default (keys are string), only the first 128 
+ * Create a hash table with provided hash, cmp, capacity and desisred
+ * load factor. If default (keys are string), only the first 128
  * characters are used during hashing and comparision.
  * If the hash table reaches the load factor, it will grow by doubling
  * the size.
  * @param the hash method to use. If NULL, Jenkin's one at a time
  *        is used, and key is interpreted as a char* with a max length
- *        of 128 characters.. 
+ *        of 128 characters..
  * @param the compare method to use. If NULL, keys are interpreted
  *        as char* with a max length of 128 characters, and strncmp(3C)
  *        is used.
@@ -68,8 +68,13 @@ void hmap_destroy(struct hmap*);
 
 /**
  * Associate a value with a key.
- * If the key is already present in the hash table, it will be updated 
+ * If the key is already present in the hash table, it will be updated
  * with the new data.
+ * If the key is not found, the pointer will be copied and stored, and so
+ * any value pointed to must be ensured to exist and be unmodified over the
+ * lifetime of the hash map.
+ * Updating an existing k-v pair is safe to perform with key pointing to
+ * memory that will be overwritten after the call has finished.
  * @param the hash table to update.
  * @param the key.
  * @param the value to insert.

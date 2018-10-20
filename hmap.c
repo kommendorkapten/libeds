@@ -6,7 +6,7 @@
 * Development and Distribution License (the "License"). You may not use this
 * file except in compliance with the License. You can obtain a copy of the
 * License at http://opensource.org/licenses/CDDL-1.0. See the License for the
-* specific language governing permissions and limitations under the License. 
+* specific language governing permissions and limitations under the License.
 * When distributing the software, include this License Header Notice in each
 * file and include the License file at http://opensource.org/licenses/CDDL-1.0.
 */
@@ -36,7 +36,7 @@ struct hmap_node
         void*    key;
         void*    data;
 #ifdef HMAP_USE_TS
-        time_t   acc_ts;        
+        time_t   acc_ts;
 #endif
         uint32_t hash;
         int flags;
@@ -47,18 +47,18 @@ static uint32_t hmap_default_hash(void* key)
         /* Jenkin's one at a time hash */
         char* k = (char*) key;
         uint32_t hash = 0;
-#ifdef __EXTENSIONS__ 
+#ifdef __EXTENSIONS__
         /* strnlen(3C) became availible SUSv4/Posix 2008 */
         size_t len = strnlen(key, MAX_KEY_LEN);
 #else
         size_t len = strlen(key);
-        
+
         if (len > MAX_KEY_LEN)
         {
                 len = MAX_KEY_LEN;
         }
 #endif
-        
+
         for (size_t i = 0; i < len; i++)
         {
                 hash += k[i];
@@ -85,7 +85,7 @@ static int hmap_default_cmp(void* a, void* b)
         {
                 return 1;
         }
-        
+
         r = strncmp((char*)a, (char*)b, MAX_KEY_LEN);
 
         return r;
@@ -135,7 +135,7 @@ void hmap_set(struct hmap* h, void* key, void* data)
 
         while (h->elems[pos].flags & FLAG_OCCUPIED)
         {
-                if (h->elems[pos].hash == k && 
+                if (h->elems[pos].hash == k &&
                     h->cfn(h->elems[pos].key, key) == 0)
                 {
                         /* Replace value */
@@ -148,13 +148,17 @@ void hmap_set(struct hmap* h, void* key, void* data)
 
                 if (pos == spos)
                 {
-                        /* We are back at the beginning, 
+                        /* We are back at the beginning,
                            should NEVER happen */
                         abort();
                 }
         }
 
-        h->elems[pos].key = key;        
+        /* Only add key if the k-v pair was added.
+           Always adding it can cause unexpected behaviour when
+           updating an existing value and the key is not dynamically
+           allocated. */
+
         h->elems[pos].data = data;
         h->elems[pos].hash = k;
         h->elems[pos].flags = FLAG_OCCUPIED;
@@ -162,6 +166,8 @@ void hmap_set(struct hmap* h, void* key, void* data)
         if (added)
         {
                 float lfactor;
+
+                h->elems[pos].key = key;
                 h->size++;
                 lfactor = ((float)h->size) / (float)h->cap;
 
@@ -177,7 +183,7 @@ void hmap_set(struct hmap* h, void* key, void* data)
                         struct hmap_node* new;
                         struct hmap_node* old;
                         size_t new_s = h->cap * sizeof(struct hmap_node);
-                        
+
                         new = malloc(new_s);
                         memset(new, 0, new_s);
 
@@ -217,7 +223,7 @@ void* hmap_get(const struct hmap* h, void* key)
         {
                 if (h->elems[pos].flags & FLAG_OCCUPIED)
                 {
-                        if (h->elems[pos].hash == k && 
+                        if (h->elems[pos].hash == k &&
                             h->cfn(h->elems[pos].key, key) == 0)
                         {
                                 return h->elems[pos].data;
@@ -225,14 +231,14 @@ void* hmap_get(const struct hmap* h, void* key)
                 }
 
                 pos = (pos + 1) % h->cap;
-                
+
                 if (pos == spos)
                 {
                         /* We are back at the beginning */
                         break;
                 }
         }
-        
+
         return NULL;
 }
 
@@ -253,7 +259,7 @@ void hmap_del(struct hmap* h, void* key)
         pos = (pos + 1) % h->cap;
         while (h->elems[pos].flags & FLAG_OCCUPIED)
         {
-                if (h->elems[pos].hash == k && 
+                if (h->elems[pos].hash == k &&
                     h->cfn(h->elems[pos].key, key) == 0)
                 {
                         h->size--;
@@ -261,14 +267,14 @@ void hmap_del(struct hmap* h, void* key)
                         return;
                 }
                 pos = (pos + 1) % h->cap;
-                
+
                 if (pos == spos)
                 {
                         /* We are back at the beginning */
                         break;
                 }
         }
-        
+
         return;
 }
 
@@ -296,7 +302,7 @@ struct hmap_entry* hmap_iter(const struct hmap* h, size_t* size)
                         p++;
                 }
         }
-        
+
         *size = h->size;
 
         return e;

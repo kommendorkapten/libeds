@@ -6,7 +6,7 @@
 * Development and Distribution License (the "License"). You may not use this
 * file except in compliance with the License. You can obtain a copy of the
 * License at http://opensource.org/licenses/CDDL-1.0. See the License for the
-* specific language governing permissions and limitations under the License. 
+* specific language governing permissions and limitations under the License.
 * When distributing the software, include this License Header Notice in each
 * file and include the License file at http://opensource.org/licenses/CDDL-1.0.
 */
@@ -22,6 +22,7 @@ static int test_hmap_clear(void);
 static int test_hmap_del(void);
 static int test_hmap_expand(void);
 static int test_hmap_iter(void);
+static int test_hmap_key_reuse(void);
 
 uint32_t const_hash(void* key)
 {
@@ -31,15 +32,16 @@ uint32_t const_hash(void* key)
 int test_hmap(void)
 {
         int ret;
-        
+
         scut_create("Test Hash table");
-        
+
         SCUT_ADD(test_hmap_create);
         SCUT_ADD(test_hmap_get_set);
         SCUT_ADD(test_hmap_clear);
         SCUT_ADD(test_hmap_del);
         SCUT_ADD(test_hmap_expand);
         SCUT_ADD(test_hmap_iter);
+        SCUT_ADD(test_hmap_key_reuse);
 
         ret = scut_run(0);
 
@@ -53,7 +55,7 @@ static int test_hmap_create(void)
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
         struct hmap_entry* i;
         size_t count;
-        
+
         SCUT_ASSERT_IE(hmap_size(h), 0);
         i = hmap_iter(h, &count);
 
@@ -71,7 +73,7 @@ static int test_hmap_create(void)
 static int test_hmap_get_set(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
-        
+
         SCUT_ASSERT_IE(hmap_size(h), 0);
 
         hmap_set(h, "a", (void*)1l);
@@ -100,7 +102,7 @@ static int test_hmap_get_set(void)
 static int test_hmap_clear(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
-        
+
         SCUT_ASSERT_IE(hmap_size(h), 0);
 
         hmap_set(h, "a", (void*)1l);
@@ -109,7 +111,7 @@ static int test_hmap_clear(void)
 
         SCUT_ASSERT_IE(hmap_size(h), 3);
         SCUT_ASSERT_IE(hmap_cap(h), 128);
-        
+
         hmap_clear(h);
         SCUT_ASSERT_IE(hmap_size(h), 0);
 
@@ -134,10 +136,10 @@ static int test_hmap_clear(void)
 static int test_hmap_del(void)
 {
         struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
-        
+
         SCUT_ASSERT_IE(hmap_size(h), 0);
 
-        hmap_set(h, "a", (void*)1l);        
+        hmap_set(h, "a", (void*)1l);
         SCUT_ASSERT_IE(hmap_get(h, "a"), (void*)1l);
         SCUT_ASSERT_IE(hmap_size(h), 1);
 
@@ -204,10 +206,10 @@ static int test_hmap_del(void)
         memcpy(&val, elems + 72, sizeof(long));
         SCUT_ASSERT_IE(val, 777L);
         memcpy(&val, elems + 96, sizeof(long));
-        SCUT_ASSERT_IE(val, 400L);        
+        SCUT_ASSERT_IE(val, 400L);
         memcpy(&val, elems + 120, sizeof(long));
         SCUT_ASSERT_IE(val, 0L);
-        
+
         hmap_destroy(h);
 
         return 0;
@@ -215,14 +217,14 @@ static int test_hmap_del(void)
 
 static int test_hmap_expand(void)
 {
-        struct hmap* h = hmap_create(NULL, NULL, 16, 0.7);        
+        struct hmap* h = hmap_create(NULL, NULL, 16, 0.7);
         long values[14] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
         char* keys[14] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                           "10", "11", "12", "13"};
         size_t elems = sizeof(keys) / sizeof(char*);
         size_t count = 0;
         struct hmap_entry* entries;
-        
+
         /* 11 first should be ok */
 
         for (size_t i = 0; i < 11; i++)
@@ -236,7 +238,7 @@ static int test_hmap_expand(void)
         /* add rest, expect expansion */
         for (size_t i = 11; i < elems; i++)
         {
-                hmap_set(h, keys[i], (void*)values[i]);                
+                hmap_set(h, keys[i], (void*)values[i]);
         }
 
         SCUT_ASSERT_IE(hmap_size(h), 14);
@@ -274,7 +276,7 @@ static int test_hmap_expand(void)
                         SCUT_FAIL(s);
                 }
         }
-        
+
 
         hmap_destroy(h);
         free(entries);
@@ -304,7 +306,7 @@ static int test_hmap_iter(void)
         for (size_t i = 0; i < elems; i++)
         {
                 int found = 0;
-                
+
                 for (size_t j = 0; j < count; j++)
                 {
                         if (exp[i] == (long)data[j].data &&
@@ -325,6 +327,34 @@ static int test_hmap_iter(void)
 
         hmap_destroy(h);
         free(data);
+
+        return 0;
+}
+
+static int test_hmap_key_reuse(void)
+{
+        struct hmap* h = hmap_create(NULL, NULL, 128, 0.7);
+        char key1[] = "abc1";
+        char key2[] = "abc1";
+        size_t count;
+        struct hmap_entry* e;
+
+        hmap_set(h, key1, (void*)1L);
+        e = hmap_iter(h, &count);
+        SCUT_ASSERT_IE(count, 1L);
+        SCUT_ASSERT_IE(e[0].key, key1);
+        SCUT_ASSERT_IE(e[0].data, 1L);
+        free(e);
+
+        /* update with different key, but same value */
+        hmap_set(h, key2, (void*)2L);
+        e = hmap_iter(h, &count);
+        SCUT_ASSERT_IE(count, 1L);
+        SCUT_ASSERT_IE(e[0].key, key1);
+        SCUT_ASSERT_IE(e[0].data, 2L);
+        free(e);
+
+        hmap_destroy(h);
 
         return 0;
 }
